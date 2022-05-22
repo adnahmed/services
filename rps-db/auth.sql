@@ -43,4 +43,16 @@ grant anonymous, examinee, proctor, admin to authenticator;
 
 alter role authenticator set password to pgrestPassword
 
+-- `auth` and `api` roles will own their respective schemas with tables, views and functions defined in them
+
+create role auth nologin;
+
+comment on role auth is
+	'Role that owns the auth schema and its objects'
+
+create role api nologin;
+
+comment on role api is
+	'Role that owns the api schema and its objects'
+
 
