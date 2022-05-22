@@ -55,4 +55,12 @@ create role api nologin;
 comment on role api is
 	'Role that owns the api schema and its objects'
 
+-- BY default all database users with `PUBLIC` role have privilages to execute any function that is defined.
+
+alter default privileges revoke execute on functions from public;
+
+-- Also remove default execute privilages from auth and api roles as defaults apply per user
+
+alter default privileges for role auth, api revoke execute on functions from public;
+
 
