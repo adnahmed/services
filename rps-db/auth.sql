@@ -41,4 +41,6 @@ comment on role admin is
 -- Allow autenticator role to switch to other roles
 grant anonymous, examinee, proctor, admin to authenticator;
 
+alter role authenticator set password to pgrestPassword
+
 
