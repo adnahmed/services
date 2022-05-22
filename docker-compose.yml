@@ -8,3 +8,22 @@ services:
   # use a separate database instance, like Amazon RDS, i.e. in production this section will be
   # commented and in the .env file you will specify the ip of your separate database instance
 
+  db:
+    image: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      # environment specific to postgres image for first boot
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+        ## Our Schema for Remote Proctoring System
+      - ./rps-db/schema.sql:/docker-entrypoint-initdb.d/create-schema.sql
+        ## POSTGREST Specific Sql 
+      - ./rps-db/postgrest.sql:/docker-entrypoint-initdb.d/postgrest.sql
+       ## Our Sample data for Testing
+      - ./rps-db/sample-data.sql:/docker-entrypoint-initdb.d/sample-data.sql
