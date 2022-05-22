@@ -27,3 +27,7 @@ services:
       - ./rps-db/postgrest.sql:/docker-entrypoint-initdb.d/postgrest.sql
        ## Our Sample data for Testing
       - ./rps-db/sample-data.sql:/docker-entrypoint-initdb.d/sample-data.sql
+    logging:
+      options:
+        max-size: 10m
+        max-file: "3"
