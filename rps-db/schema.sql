@@ -64,22 +64,22 @@ create table rps.exams
 comment on table rps.exams is
 	'All Exams in our Application'
 
-create table rps.exam_proctors
+create table rps.exams_proctors
 	( exam_id 	bigint not null references rps.exams
 	, proctor_id	bigint not null references rps.proctors
 	, primary key (exam_id, proctor_id)
 );
 
-comment on table rps.exam_proctors is 
+comment on table rps.exams_proctors is 
 	'Proctors for Exams in our Application'
 
-create table rps.exam_examinees
+create table rps.exams_examinees
 	( exam_id 	bigint not null references rps.exams
 	, examinee_id	bigint not null references rps.examinees
 	, primary key (exam_id, examinee_id)
 );
 
-comment on table rps.exam_examinees is 
+comment on table rps.exams_examinees is 
 	'Examinees for Exams in our Application'
 
 create table rps.examinees_proctors
