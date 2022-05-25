@@ -64,3 +64,11 @@ create table rps.exams
 comment on table rps.exams is
 	'All Exams in our Application'
 
+create table rps.exam_proctors
+	( exam_id 	bigint not null references rps.exams
+	, proctor_id	bigint not null references rps.proctors
+	, primary key (exam_id, proctor_id)
+);
+
+comment on table rps.exam_proctors is 
+	'Proctors for Exams in our Application'
