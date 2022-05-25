@@ -63,4 +63,20 @@ alter default privileges revoke execute on functions from public;
 
 alter default privileges for role auth, api revoke execute on functions from public;
 
+--- #### Hashing Password
+--- Salt and Hash all passwords with a trigger.
+--- ```sql
+
+create function rps.cryptpassword()
+	returns trigger
+	language plpgsql
+	as $$
+	   begin
+		if tg_op = 'INSERT' or new.password<> old.password then
+			new.password = crypt(new.password, gen_salt('bf'));
+		end if;
+		return new;
+	end
+	$$;
+
 
