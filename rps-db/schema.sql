@@ -51,3 +51,16 @@ create table rps.subjects(
 
 comment on table rps.subjects is
 	'All Subjects in our Application'
+
+create table rps.exams
+	( exam_id 	bigserial primary key
+	, administrator_id bigint references rps.administrators -- Exam is owned by administrator
+	, subject_id	text references	rps.subjects -- Exam belongs to a subject
+	, title		text not null
+	
+	, unique (exam_id)
+	);
+
+comment on table rps.exams is
+	'All Exams in our Application'
+
