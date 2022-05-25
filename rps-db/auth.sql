@@ -128,3 +128,11 @@ grant
 on table rps.administrators
 to api;
 
+--- ### To register new examinees
+grant all on rps.examinees_examinee_id_seq to api;
+
+--- ### To register new proctors
+grant all on rps.proctors_proctor_id_seq to api;
+
+--- ### To register new administrators
+grant all on rps.administrators_administrator_id_seq to api;
