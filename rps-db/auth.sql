@@ -104,4 +104,27 @@ grant references, select(proctor_id, username, password) on table rps.proctors t
 --- #### Permissions on the `administrators` table
 grant references, select(administrator_id, username, password) on table rps.administrators to auth;
 
+--- Granting Selective permission to our api
+---```sql
+
+grant 
+	select(examinee_id, username),
+	insert(name, password),
+	update(name, username, password)
+on table rps.examinees
+to api;
+
+grant 
+	select(proctor_id, username),
+	insert(name, password),
+	update(name, username, password)
+on table rps.proctors
+to api;
+
+grant
+	select(administrator_id, username),
+	insert(name, password),
+	update(name, username, password)
+on table rps.administrators
+to api;
 
