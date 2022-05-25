@@ -9,7 +9,7 @@ services:
   # commented and in the .env file you will specify the ip of your separate database instance
 
   db:
-    image: postgres
+    image: adnandataimages/pgtap_postgres
     restart: always
     ports:
       - "5432:5432"
