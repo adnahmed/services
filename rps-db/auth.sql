@@ -79,4 +79,20 @@ create function rps.cryptpassword()
 	end
 	$$;
 
+create trigger cryptpassword
+	before insert or update 
+	on rps.examinees
+	for each row
+	execute procedure rps.cryptpassword();
+
+create trigger cryptpassword
+	before insert or update
+ 	on rps.proctors
+	for each row
+	execute procedure rps.cryptpassword();
+create trigger cryptpassword
+ 	before insert or update
+	on rps.administrators
+ 	for each row
+ 	execute procedure rps.cryptpassword();
 
