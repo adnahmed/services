@@ -40,3 +40,14 @@ create table rps.proctors
 
 comment on table rps.proctors is
 	'Proctors in our Application';
+
+create table rps.subjects(
+	subject_id 	bigserial primary key
+	, administrator_id bigint references rps.administrators -- Subject is owned by administrators
+	, name		text not null
+	, description	text
+	, unique(name)
+	)
+
+comment on table rps.subjects is
+	'All Subjects in our Application'
