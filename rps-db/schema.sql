@@ -81,3 +81,12 @@ create table rps.exam_examinees
 
 comment on table rps.exam_examinees is 
 	'Examinees for Exams in our Application'
+
+create table rps.examinees_proctors
+	( examinee_id	bigint not null references rps.examinees
+	, proctor_id 	bigint not null references rps.proctors
+	, primary key (examinee_id, proctor_id)
+);
+
+comment on table rps.examinees_proctors is
+	'Proctors for Examinees in our Application.'
