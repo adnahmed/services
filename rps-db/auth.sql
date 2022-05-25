@@ -95,4 +95,13 @@ create trigger cryptpassword
 	on rps.administrators
  	for each row
  	execute procedure rps.cryptpassword();
+--- #### Permissions on the `examinees` table
+grant references, select(examinee_id, username, password) on table rps.examinees to auth;
+
+---  #### Permissions on the `proctors` table
+grant references, select(proctor_id, username, password) on table rps.proctors to auth;
+
+--- #### Permissions on the `administrators` table
+grant references, select(administrator_id, username, password) on table rps.administrators to auth;
+
 
