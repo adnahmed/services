@@ -1,14 +1,7 @@
 version: '3'
 
 services:
-  ### DB START
-  # This is the database to which the all the other components in the stack will connect and interact with
-  # (but mostly it's PostgREST that is going to be responsible for the bulk of the db traffic)
-  # Having the database in a container is very convenient in development but in production you will
-  # use a separate database instance, like Amazon RDS, i.e. in production this section will be
-  # commented and in the .env file you will specify the ip of your separate database instance
-
-  db:
+   db:
     image: postgres
     restart: always
     ports:
@@ -22,7 +15,6 @@ services:
       - ./rps-db/schema.sql:/docker-entrypoint-initdb.d/create-schema.sql
       - ./rps-db/postgrest.sql:/docker-entrypoint-initdb.d/postgrest.sql
       - ./rps-db/sample-data.sql:/docker-entrypoint-initdb.d/sample-data.sql
-
   postgrest:
     image: postgrest/postgrest
     ports:
@@ -30,8 +22,8 @@ services:
     environment:
       - PGRST_JWT_SECRET=${JWT_SECRET} # For verfication of signature
       - PGRST_DB_URI=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
-      - PGRST_DB_SCHEMA=api
-      - PGRST_DB_ANON_ROLE=web_anon # Anonymous role 
+      - PGRST_DB_SCHEMA=${PGRST_DB_SCHEMA}
+      - PGRST_DB_ANON_ROLE=${PGRST_DB_ANON_ROLE} # Anonymous role 
       - PGRST_SERVER_PROXY_URI=${POSTGREST_SERVER_PROXY}
       - PGRST_ROLE_CLAIM_KEY=${POSTGREST_ROLE_CLAIM_KEY}
     depends_on:
