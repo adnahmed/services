@@ -1,8 +1,9 @@
 version: '3'
 
 services:
-   db:
-    image: postgres
+
+  db:
+    image: adnandataimages/pgtap_postgres
     restart: always
     ports:
       - "5432:5432"
