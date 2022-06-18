@@ -13,20 +13,4 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
     volumes:
       - ./postgres-data:/var/lib/postgresql/data
-      - ./rps-db/schema.sql:/docker-entrypoint-initdb.d/create-schema.sql
-      - ./rps-db/postgrest.sql:/docker-entrypoint-initdb.d/postgrest.sql
-      - ./rps-db/sample-data.sql:/docker-entrypoint-initdb.d/sample-data.sql
-  postgrest:
-    image: postgrest/postgrest
-    ports:
-      - "3000:3000"
-    environment:
-      - PGRST_JWT_SECRET=${JWT_SECRET} # For verfication of signature
-      - PGRST_DB_URI=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
-      - PGRST_DB_SCHEMA=${PGRST_DB_SCHEMA}
-      - PGRST_DB_ANON_ROLE=${PGRST_DB_ANON_ROLE} # Anonymous role 
-      - PGRST_SERVER_PROXY_URI=${POSTGREST_SERVER_PROXY}
-      - PGRST_ROLE_CLAIM_KEY=${POSTGREST_ROLE_CLAIM_KEY}
-    depends_on:
-      - db
 
