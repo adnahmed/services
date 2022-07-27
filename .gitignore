@@ -1,2 +1,4 @@
 # Neo4j Container Files
 neo4j/ 
+# Redis Container Files
+redis/
