@@ -19,7 +19,7 @@ services:
       - ${NEO4J_PLUGIN_DIR}:/plugins
 
   cache:
-    profiles: ["backend"]
+    profiles: ["backend", "cache"]
     image: redis
     ports:
       - "6379:6379"
