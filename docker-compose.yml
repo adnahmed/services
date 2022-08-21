@@ -11,14 +11,12 @@ services:
       - "7474:7474"
         # - "7473:7473" # For Https
     environment:
-      - NEO4J_AUTH=${NEO4J_AUTH}
-      - NEO4J_DBMS_MEMORY_PAGECACHE_SIZE=${NEO4J_DBMS_MEMORY_PAGECACHE_SIZE}
-      - NEO4J_DBMS_MEMORY_HEAP_MAX_SIZE=${NEO4J_DBMS_MEMORY_HEAP_MAX_SIZE}
+      - NEO4J_AUTH=${NEO4J_AUTH:-neo4j/test}
     volumes:
-      - ${NEO4J_DATA_DIR}:/data
-      - ${NEO4J_LOGS_DIR}:/logs
-      - ${NEO4J_IMPORT_DIR}:/var/lib/neo4j/import
-      - ${NEO4J_PLUGIN_DIR}:/plugins
+      - ${NEO4J_DATA_DIR:-./neo4j/data}:/data
+      - ${NEO4J_LOGS_DIR:-./neo4j/logs}:/logs
+      - ${NEO4J_IMPORT_DIR:-./neo4j/import}:/var/lib/neo4j/import
+      - ${NEO4J_PLUGIN_DIR:-./neo4j/plugins}:/plugins
         # - ${NEO4J_CONF_DIR}:/conf
 
   cache:
@@ -30,8 +28,8 @@ services:
     command:
       redis-server /usr/local/etc/redis 
     volumes:
-      - ${REDIS_CONF}:/usr/local/etc/redis
-      - ${REDIS_ACL}:/etc/redis/users.acl
+      - ${REDIS_CONF:-./redis}:/usr/local/etc/redis
+      - ${REDIS_ACL:-./redis/users.acl}:/etc/redis/users.acl
 
   sfu:
     # TODO: Add prometheus to monitor service
@@ -45,9 +43,20 @@ services:
     command: 
        --config '/livekit.yaml'
     volumes:
-      - ${LKCONFIG_PATH}:/livekit.yaml
+      - ${LKCONFIG_PATH:-./livekit.yml}:/livekit.yaml
     depends_on: # This will deprecate in near future.
+      - turn_server
       - cache
+  
+  turn_server:
+    profiles: ["backend", "webrtc", "stun"]
+    image: instrumentisto/coturn
+    restart: unless-stopped
+    network_mode: "host" # Docker does not work well with large port ranges
+    tmpfs:
+      - /var/lib/coturn
+    volumes:
+      - ${TURNSERVER_CONFIG:-./stun/turnserver.conf}:/etc/coturn/turnserver.conf
 
   # recorder:
   #   profile: ["webrtc", "backend"]
@@ -62,8 +71,8 @@ services:
      - "9001:9001"
      - "8001:8001"
     volumes:
-     - ${MODELS_PATH}:/models/
-     - ${MODEL_SERVER_CONFIG}:/opt/ml/config.json
+      - ${MODELS_PATH:-./openino/models}:/models/
+      - ${MODEL_SERVER_CONFIG:-./openvino/config.json}:/opt/ml/config.json
     command:
       --config_path /opt/ml/config.json --port 9001 --rest_port 8001
 
