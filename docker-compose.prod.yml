@@ -1,0 +1,80 @@
+version: '3'
+services:
+
+  db:
+    # TODO: Add Kafka pub/sub to perform operations after receieving data from stream.
+    profiles: ["backend", "db"]
+    image: neo4j:latest
+    restart: unless-stopped
+    ports:
+      - "7687:7687"
+      - "7474:7474"
+        # - "7473:7473" # For Https
+    environment:
+      - NEO4J_AUTH=${NEO4J_AUTH:-neo4j/test}
+    volumes:
+      - ${NEO4J_DATA_DIR:-./neo4j/data}:/data
+      - ${NEO4J_LOGS_DIR:-./neo4j/logs}:/logs
+      - ${NEO4J_IMPORT_DIR:-./neo4j/import}:/var/lib/neo4j/import
+      - ${NEO4J_PLUGIN_DIR:-./neo4j/plugins}:/plugins
+        # - ${NEO4J_CONF_DIR}:/conf
+
+  cache:
+    profiles: ["backend", "cache", "webrtc"]
+    image: redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command:
+      redis-server /usr/local/etc/redis 
+    volumes:
+      - ${REDIS_CONF:-./redis}:/usr/local/etc/redis
+      - ${REDIS_ACL:-./redis/users.acl}:/etc/redis/users.acl
+
+  sfu:
+    # TODO: Add prometheus to monitor service, port: 6789
+    profiles: ["webrtc", "backend"]
+    image: livekit/livekit-server
+    restart: unless-stopped
+    ports:
+      - "7880:7880" 
+      - "7881:7881" 
+      - "7882:7882/udp"
+    command: 
+       --config '/livekit.yaml'
+    volumes:
+      - ${LKCONFIG_PATH:-./livekit.yml}:/livekit.yaml
+    depends_on: # This will deprecate in near future.
+      - stun
+      - cache
+  
+  stun:
+    # TODO: Use prometheus for monitoring status, port: 9641
+    profiles: ["backend", "webrtc", "stun"]
+    image: instrumentisto/coturn
+    restart: unless-stopped
+    network_mode: "host" # Docker does not work well with large port ranges
+    tmpfs:
+      - /var/lib/coturn
+    volumes:
+      - ${TURNSERVER_CONFIG:-./stun/turnserver.conf}:/etc/coturn/turnserver.conf
+
+  # recorder:
+  #   profile: ["webrtc", "backend"]
+  #   image: livekit/egress
+  #   ports: 
+  #     -
+
+  ai:
+    profiles: ["ai","backend"]
+    image: openvino/model_server
+    ports: 
+     - "9001:9001"
+      - NEO4J_AUTH=${NEO4J_AUTH:-neo4j/test}
+    volumes:
+      - ${MODELS_PATH:-./openino/models}:/models/
+      - ${MODEL_SERVER_CONFIG:-./openvino/config.json}:/opt/ml/config.json
+    command:
+      --config_path /opt/ml/config.json --port 9001 --rest_port 8001
+
+
