@@ -34,7 +34,7 @@ rtc:
   # when set to true, attempts to discover the host's public IP via STUN
   # this is useful for cloud environments such as AWS & Google where hosts have an internal IP
   # that maps to an external one
-  use_external_ip: true
+  # use_external_ip: true
   # when set to true, server will use a lite ice agent, that will speed up ice connection, but 
   # might cause connect issue if server running behind NAT.
   # use_ice_lite: true
@@ -48,23 +48,23 @@ rtc:
   # packet_buffer_size: 500
   # # optional STUN servers for LiveKit clients to use. Clients will be configured to use these STUN servers automatically.
   # # by default LiveKit clients use Google's public STUN servers
-  # stun_servers:
-  #   - server1
+  stun_servers:
+     - stun
   # # optional TURN servers for clients. This isn't necessary if using embedded TURN server (see below).
-  # turn_servers:
-  #   - host: myhost.com
-  #     port: 443
+  #turn_servers:
+  #   - host: localhost
+  #     port: 3478
   #     # tls, tcp, or udp
-  #     protocol: tls
+  #     protocol: tcp
   #     username: ""
   #     credential: ""
   # # allows LiveKit to monitor congestion when sending streams and automatically
   # # manage bandwidth utilization to avoid congestion/loss. Enabled by default
-  # congestion_control:
-  #   enabled: true
+  congestion_control:
+     enabled: true
   #   # in the unlikely event of highly congested networks, SFU may choose to pause some tracks
   #   # in order to allow others to stream smoothly. You can disable this behavior here
-  #   allow_pause: true
+     allow_pause: false
   # # minimum amount of time between pli/fir rtcp packets being sent to an individual
   # # producer. Increasing these times can lead to longer black screens when new participants join,
   # # while reducing them can lead to higher stream bitrate.
@@ -83,7 +83,7 @@ rtc:
   #     - docker0
 
 # when enabled, LiveKit will expose prometheus metrics on :6789/metrics
-  prometheus_port: 6789
+#  prometheus_port: 6789
 
 # API key / secret pairs.
 # Keys are used for JWT authentication, server APIs would require a keypair in order to generate access tokens
@@ -134,7 +134,7 @@ webhook:
    api_key: APItrPRpw93WoiW
 #   # list of URLs to be notified of room events
    urls:
-     - http://localhost:3001/webhook-endpoint
+     - http://localhost:3001/lk_webhooks
 
 # customize audio level sensitivity
 # audio:
@@ -151,16 +151,16 @@ webhook:
 #   smooth_intervals: 4
 
 # turn server
-# turn:
+#turn:
 #   # Uses TLS. Requires cert and key pem files by either:
 #   # - using turn.secretName if deploying with our helm chart, or
 #   # - setting LIVEKIT_TURN_CERT and LIVEKIT_TURN_KEY env vars with file locations, or
 #   # - using cert_file and key_file below
 #   # defaults to false
-#   enabled: false
+#    enabled: true
 #   # defaults to 3478 - recommended to 443 if not running HTTP3/QUIC server
 #   # only 53/80/443 are allowed if less than 1024
-#   udp_port: 3478
+#    udp_port: 3478
 #   # defaults to 5349 - if not using a load balancer, this must be set to 443
 #   tls_port: 5349
 #   # set UDP port range for TURN relay to connect to LiveKit SFU, by default it uses a any available port
