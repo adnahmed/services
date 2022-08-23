@@ -2,46 +2,49 @@ version: '3'
 services:
 
   db:
+    env_file: .env.dev
     # TODO: Add Kafka pub/sub to perform operations after receieving data from stream.
     profiles: ["backend", "db"]
     image: neo4j:latest
     restart: unless-stopped
     ports:
-      - "7687:7687"
-      - "7474:7474"
-        # - "7473:7473" # For Https
+      - ${NEO4J_BOLT_PORT}:7687
+      - ${NEO4J_HTTP_PORT}:7474
+        # - ${NEO4J_HTTPS_PORT}:7473 # For Https
     environment:
-      - NEO4J_AUTH=${NEO4J_AUTH:-neo4j/test}
+      - NEO4J_AUTH=${NEO4J_AUTH:-dev/test}
     volumes:
-      - ${NEO4J_DATA_DIR:-./neo4j/data}:/data
-      - ${NEO4J_LOGS_DIR:-./neo4j/logs}:/logs
-      - ${NEO4J_IMPORT_DIR:-./neo4j/import}:/var/lib/neo4j/import
-      - ${NEO4J_PLUGIN_DIR:-./neo4j/plugins}:/plugins
-        # - ${NEO4J_CONF_DIR}:/conf
+      - ${NEO4J_DATA_DIR:-./dev/neo4j/data}:/data
+      - ${NEO4J_LOGS_DIR:-./dev/neo4j/logs}:/logs
+      - ${NEO4J_IMPORT_DIR:-./dev/neo4j/import}:/var/lib/neo4j/import
+      - ${NEO4J_PLUGIN_DIR:-./dev/neo4j/plugins}:/plugins
+        # - ${NEO4J_CONF_DIR:-./dev/neo4j_conf}:/conf
 
   cache:
+    env_file: .env.dev
     profiles: ["backend", "cache", "webrtc"]
     image: redis
     restart: unless-stopped
     ports:
-      - "6379:6379"
+      - ${REDIS_HTTP_PORT:-7379}:6379
     command:
       redis-server /usr/local/etc/redis 
     volumes:
-      - ${REDIS_CONF:-./redis}:/usr/local/etc/redis
-      - ${REDIS_ACL:-./redis/users.acl}:/etc/redis/users.acl
+      - ${REDIS_CONF:-./dev/redis}:/usr/local/etc/redis
+      - ${REDIS_ACL:-./dev/redis/users.acl}:/etc/redis/users.acl
 
   sfu:
-    # TODO: Add prometheus to monitor service, port: 6789
+    env_file: .env.dev
+    # TODO: Add prometheus to monitor service, port: 7789
     profiles: ["webrtc", "backend"]
     image: livekit/livekit-server
     restart: unless-stopped
     ports:
-      - "7880:7880" 
-      - "7881:7881" 
-      - "7882:7882/udp"
+      - ${LK_SERVER_PORT:-8880}:7880 
+      - ${LK_TCP_PORT:-8881}:7881 
+      - ${LK_UDP_PORT:-8882}:7882/udp
     command: 
-       --config '/livekit.yaml'
+    --config ${LK_CONFIG_PATH:-./dev/livekit.yaml}
     volumes:
       - ${LKCONFIG_PATH:-./livekit.yml}:/livekit.yaml
     depends_on: # This will deprecate in near future.
@@ -49,6 +52,7 @@ services:
       - cache
   
   stun:
+    env_file: .env.dev
     # TODO: Use prometheus for monitoring status, port: 9641
     profiles: ["backend", "webrtc", "stun"]
     image: instrumentisto/coturn
@@ -57,7 +61,7 @@ services:
     tmpfs:
       - /var/lib/coturn
     volumes:
-      - ${TURNSERVER_CONFIG:-./stun/turnserver.conf}:/etc/coturn/turnserver.conf
+      - ${TURNSERVER_CONFIG:-./dev/stun/turnserver.conf}:/etc/coturn/turnserver.conf
 
   # recorder:
   #   profile: ["webrtc", "backend"]
@@ -66,14 +70,16 @@ services:
   #     -
 
   ai:
+    env_file: .env.dev
     profiles: ["ai","backend"]
     image: openvino/model_server
     ports: 
-     - "9001:9001"
+      - ${OPENVINO_RPC_PORT:-9000}:9001
+      - ${OPENVINO_REST_PORT:-8000}:8001
       - NEO4J_AUTH=${NEO4J_AUTH:-neo4j/test}
     volumes:
       - ${MODELS_PATH:-./openino/models}:/models/
-      - ${MODEL_SERVER_CONFIG:-./openvino/config.json}:/opt/ml/config.json
+      - ${MODEL_SERVER_CONFIG:-./dev/openvino/config.json}:/opt/ml/config.json
     command:
       --config_path /opt/ml/config.json --port 9001 --rest_port 8001
 
