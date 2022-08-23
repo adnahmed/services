@@ -20,7 +20,7 @@ services:
         # - ${NEO4J_CONF_DIR}:/conf
 
   cache:
-    profiles: ["backend", "cache"]
+    profiles: ["backend", "cache", "webrtc"]
     image: redis
     restart: unless-stopped
     ports:
@@ -32,7 +32,7 @@ services:
       - ${REDIS_ACL:-./redis/users.acl}:/etc/redis/users.acl
 
   sfu:
-    # TODO: Add prometheus to monitor service
+    # TODO: Add prometheus to monitor service, port: 6789
     profiles: ["webrtc", "backend"]
     image: livekit/livekit-server
     restart: unless-stopped
@@ -45,10 +45,11 @@ services:
     volumes:
       - ${LKCONFIG_PATH:-./livekit.yml}:/livekit.yaml
     depends_on: # This will deprecate in near future.
-      - turn_server
+      - stun
       - cache
   
-  turn_server:
+  stun:
+    # TODO: Use prometheus for monitoring status, port: 9641
     profiles: ["backend", "webrtc", "stun"]
     image: instrumentisto/coturn
     restart: unless-stopped
