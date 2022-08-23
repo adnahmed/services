@@ -1,1 +1,2 @@
-postgres-data/
+# Neo4j Container Files
+neo4j/ 

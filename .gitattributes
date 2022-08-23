@@ -1,1 +1,13 @@
+openvino/models/model4/1/head-pose-estimation-adas-0001.xml filter=lfs diff=lfs merge=lfs -text
+openvino/models/model5/1/landmarks-regression-retail-0009.xml filter=lfs diff=lfs merge=lfs -text
+openvino/models/model3/1/gaze-estimation-adas-0002.bin filter=lfs diff=lfs merge=lfs -text
+openvino/models/model5/1/landmarks-regression-retail-0009.bin filter=lfs diff=lfs merge=lfs -text
+openvino/models/model4/1/head-pose-estimation-adas-0001.bin filter=lfs diff=lfs merge=lfs -text
+openvino/models/model6/1/detr-resnet50.bin filter=lfs diff=lfs merge=lfs -text
+openvino/models/model1/1/face-detection-retail-0004.xml filter=lfs diff=lfs merge=lfs -text
+openvino/models/model2/1/face-reidentification-retail-0095.xml filter=lfs diff=lfs merge=lfs -text
+openvino/models/model3/1/gaze-estimation-adas-0002.xml filter=lfs diff=lfs merge=lfs -text
+openvino/models/model6/1/detr-resnet50.xml filter=lfs diff=lfs merge=lfs -text
+openvino/models/model1/1/face-detection-retail-0004.bin filter=lfs diff=lfs merge=lfs -text
+openvino/models/model2/1/face-reidentification-retail-0095.bin filter=lfs diff=lfs merge=lfs -text
 . !text !filter !merge !diff
