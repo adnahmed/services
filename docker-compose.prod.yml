@@ -2,29 +2,32 @@ version: '3'
 services:
 
   db:
+    env_file: .env.prod
     # TODO: Add Kafka pub/sub to perform operations after receieving data from stream.
     profiles: ["backend", "db"]
     image: neo4j:latest
     restart: unless-stopped
     ports:
-      - "7687:7687"
-      - "7474:7474"
-        # - "7473:7473" # For Https
+      - ${N4J_BOLT_PORT:-7687}:7687
+      - ${N4J_HTTP_PORT:-7474}:7474
+        # - ${N4J_HTTPS_PORT:-7473}:7473 # For Https
     environment:
-      - NEO4J_AUTH=${NEO4J_AUTH:-neo4j/test}
+      - N4J_AUTH=${NEO4J_AUTH:-neo4j/test}
     volumes:
-      - ${NEO4J_DATA_DIR:-./neo4j/data}:/data
-      - ${NEO4J_LOGS_DIR:-./neo4j/logs}:/logs
-      - ${NEO4J_IMPORT_DIR:-./neo4j/import}:/var/lib/neo4j/import
-      - ${NEO4J_PLUGIN_DIR:-./neo4j/plugins}:/plugins
-        # - ${NEO4J_CONF_DIR}:/conf
+      - ${N4J_DATA_DIR:-./neo4j/data}:/data
+      - ${N4J_LOGS_DIR:-./neo4j/logs}:/logs
+      - ${N4J_IMPORT_DIR:-./neo4j/import}:/var/lib/neo4j/import
+      - ${N4J_PLUGIN_DIR:-./neo4j/plugins}:/plugins
+        # - ${N4J_CONF_DIR:-./neo4j/conf}:/conf Only ever use config file or env variables
+        # - ${N4J_SSL_DIR:-./neo4j/ssl}:/ssl 
 
   cache:
+    env_file: .env.dev
     profiles: ["backend", "cache", "webrtc"]
     image: redis
     restart: unless-stopped
     ports:
-      - "6379:6379"
+      - ${REDIS_HTTP_PORT:-6379}:6379
     command:
       redis-server /usr/local/etc/redis 
     volumes:
@@ -32,16 +35,17 @@ services:
       - ${REDIS_ACL:-./redis/users.acl}:/etc/redis/users.acl
 
   sfu:
+    env_file: .env.prod
     # TODO: Add prometheus to monitor service, port: 6789
     profiles: ["webrtc", "backend"]
     image: livekit/livekit-server
     restart: unless-stopped
     ports:
-      - "7880:7880" 
-      - "7881:7881" 
-      - "7882:7882/udp"
+      - ${LK_SERVER_PORT:-7880}:7880 
+      - ${LK_TCP_PORT:-7881}:7881 
+      - ${LK_UDP_PORT:-7882}:7882/udp
     command: 
-       --config '/livekit.yaml'
+      --config /livekit.yml
     volumes:
       - ${LKCONFIG_PATH:-./livekit.yml}:/livekit.yaml
     depends_on: # This will deprecate in near future.
@@ -49,6 +53,7 @@ services:
       - cache
   
   stun:
+    env_file: .env.prod
     # TODO: Use prometheus for monitoring status, port: 9641
     profiles: ["backend", "webrtc", "stun"]
     image: instrumentisto/coturn
@@ -66,11 +71,12 @@ services:
   #     -
 
   ai:
+    env_file: .env.prod
     profiles: ["ai","backend"]
     image: openvino/model_server
     ports: 
-     - "9001:9001"
-      - NEO4J_AUTH=${NEO4J_AUTH:-neo4j/test}
+      - ${OPENVINO_RPC_PORT:-9001}:9001
+      - ${OPENVINO_REST_PORT:-8001}:8001
     volumes:
       - ${MODELS_PATH:-./openino/models}:/models/
       - ${MODEL_SERVER_CONFIG:-./openvino/config.json}:/opt/ml/config.json
