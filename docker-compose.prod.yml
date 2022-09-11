@@ -12,7 +12,7 @@ services:
       - ${N4J_HTTP_PORT:-7474}:7474
         # - ${N4J_HTTPS_PORT:-7473}:7473 # For Https
     environment:
-      - N4J_AUTH=${NEO4J_AUTH:-neo4j/test}
+      - NEO4J_AUTH=${N4J_AUTH:-neo4j/test}
     volumes:
       - ${N4J_DATA_DIR:-./neo4j/data}:/data
       - ${N4J_LOGS_DIR:-./neo4j/logs}:/logs
@@ -22,7 +22,7 @@ services:
         # - ${N4J_SSL_DIR:-./neo4j/ssl}:/ssl 
 
   cache:
-    env_file: .env.dev
+    env_file: .env.prod
     profiles: ["backend", "cache", "webrtc"]
     image: redis
     restart: unless-stopped
@@ -83,4 +83,17 @@ services:
     command:
       --config_path /opt/ml/config.json --port 9001 --rest_port 8001
 
-
+  object_store:
+    profiles: ["object_store", "backend"]
+    env_file: .env.prod
+    image: minio/minio
+    ports:
+      - ${MINIO_PORT:-9000}:9000
+    volumes:
+      - ${MINIO_DATA_PATH:-./minio/.minio/data}:/export
+      - ${MINIO_CONFIG_PATH:-./minio/.minio/config}:/root/.minio
+    environment:
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY:-93a6198ff28f}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY:-8540304a492157284fdc89f7093d2b8e52d925a0b9a1345f7c097abbf94465f8}
+      - MINIO_HTTP_TRACE=${MINIO_HTTP_TRACE:-/dev/stdout}
+    command: server /export
