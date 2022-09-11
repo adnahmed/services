@@ -91,8 +91,8 @@ services:
       - ${MINIO_DATA_PATH:-./dev/minio/.minio/data}:/export
       - ${MINIO_CONFIG_PATH:-./dev/minio/.minio/config}:/root/.minio
     environment:
-      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY:-foobar}
-      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY:-foobarfoobarfoobar}
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER:-foobar}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD:-foobarfoobarfoobar}
       - MINIO_HTTP_TRACE=/dev/stdout
     command: server /export
 
