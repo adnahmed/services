@@ -1,2 +1,6 @@
 # Neo4j Container Files
 neo4j/ 
+dev/neo4j/
+# Minio Data Files
+minio/
+dev/minio/
