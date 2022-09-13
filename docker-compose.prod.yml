@@ -45,9 +45,9 @@ services:
       - ${LK_TCP_PORT:-7881}:7881 
       - ${LK_UDP_PORT:-7882}:7882/udp
     command: 
-      --config /livekit.yml
+      --config /livekit.yaml
     volumes:
-      - ${LKCONFIG_PATH:-./livekit.yml}:/livekit.yaml
+      - ${LKCONFIG_PATH:-./livekit.yaml}:/livekit.yaml
     depends_on: # This will deprecate in near future.
       - stun
       - cache
@@ -78,7 +78,7 @@ services:
       - ${OPENVINO_RPC_PORT:-9001}:9001
       - ${OPENVINO_REST_PORT:-8001}:8001
     volumes:
-      - ${MODELS_PATH:-./openino/models}:/models/
+      - ${MODELS_PATH:-./openvino/models}:/models/
       - ${MODEL_SERVER_CONFIG:-./openvino/config.json}:/opt/ml/config.json
     command:
       --config_path /opt/ml/config.json --port 9001 --rest_port 8001
