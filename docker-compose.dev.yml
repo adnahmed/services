@@ -63,11 +63,13 @@ services:
     volumes:
       - ${TURNSERVER_CONFIG:-./dev/stun/turnserver.conf}:/etc/coturn/turnserver.conf
 
-  # recorder:
-  #   profile: ["webrtc", "backend"]
-  #   image: livekit/egress
-  #   ports: 
-  #     -
+  recorder:
+    profiles: ["webrtc", "backend"]
+    image: livekit/egress
+    environment: 
+      - EGRESS_CONFIG_FILE=/out/config.yaml
+    volumes:
+      - ${EGRESS_CONFIG_PATH:-./dev/egress.yaml}:/out/config.yaml
 
   ai:
     env_file: .env.dev

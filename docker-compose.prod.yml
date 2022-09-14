@@ -64,13 +64,15 @@ services:
     volumes:
       - ${TURNSERVER_CONFIG:-./stun/turnserver.conf}:/etc/coturn/turnserver.conf
 
-  # recorder:
-  #   profile: ["webrtc", "backend"]
-  #   image: livekit/egress
-  #   ports: 
-  #     -
+  recorder:
+    profile: ["webrtc", "backend"]
+    image: livekit/egress
+    environment: 
+      - EGRESS_CONFIG_FILE=/out/config.yaml
+    volumes:
+      - ${EGRESS_CONFIG_PATH:-./egress.yaml}:/out/config.yaml
 
-  ai:
+ ai:
     env_file: .env.prod
     profiles: ["ai","backend"]
     image: openvino/model_server
