@@ -1,0 +1,10 @@
+log_level: debug
+api_key: APItrPRpw93WoiW
+api_secret: CSNYtif1ll1nvoeeqpV7mcMMKI7fQs34vSJ3BQLhUPJA
+ws_url: ws://192.168.65.2:7880
+insecure: true
+redis:
+  address: 192.168.65.2:6379
+  username: 'default'
+  password: ''
+  db: 0
