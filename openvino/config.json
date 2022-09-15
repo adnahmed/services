@@ -1,40 +1,198 @@
 {
-   "model_config_list":[
-      {
-         "config":{
-            "name":"face-detection",
-            "base_path":"/models/model1/"
-         }
-      },
-      {
-         "config":{
-            "name":"face-reidentification",
-            "base_path":"/models/model2/"
-         }
-      },
-      {
-         "config":{
-            "name":"gaze-estimation",
-            "base_path":"/models/model3/"
-         }
-      },
-      {
-         "config":{
-             "name":"head-pose-estimation",
-             "base_path":"/models/model4/"
-	 }
-      },
-      {
-         "config":{
-             "name":"landmarks-regression",
-             "base_path":"/models/model5/"
-         }
-      },
-      {
-         "config":{
-             "name":"object-detection",
-             "base_path":"/models/model6/"
-         }
+  "model_config_list": [
+    {
+      "config": {
+        "name": "face-detection",
+        "base_path": "/models/model1/"
       }
-   ]
+    },
+    {
+      "config": {
+        "name": "face-reidentification",
+        "base_path": "/models/model2/"
+      }
+    },
+    {
+      "config": {
+        "name": "gaze-estimation",
+        "base_path": "/models/model3/"
+      }
+    },
+    {
+      "config": {
+        "name": "head-pose-estimation",
+        "base_path": "/models/model4/"
+      }
+    },
+    {
+      "config": {
+        "name": "landmarks-regression",
+        "base_path": "/models/model5/"
+      }
+    },
+    {
+      "config": {
+        "name": "object-detection",
+        "base_path": "/models/model6/"
+      }
+    }
+  ],
+  "custom_node_library_config_list": [
+    {
+      "name": "image_transformation_custom",
+      "base_path": "/models/custom/image_transformation/libcustom_node_image_transformation.so"
+    },
+    {
+      "name": "object_detection_image_extractor_custom",
+      "base_path": "/models/custom_node/object_detection/libcustom_node_model_zoo_intel_object_detection.so"
+    }
+  ],
+  "pipeline_config_list": [
+    {
+      "name": "remote_proctoring_pipeline",
+      "inputs": ["image"],
+      "nodes": [
+        {
+          "name": "face-detection_node",
+          "model_name": "face-detection",
+          "type": "DL model",
+          "inputs": [
+            { "input": { "node_name": "request", "data_item": "image" } }
+          ],
+          "outputs": [
+            { "data_item": "detection_out", "alias": "face_rois_out" }
+          ]
+        },
+        {
+          "name": "extract_node",
+          "library_name": "object_detection_image_extractor_custom",
+          "type": "custom",
+          "demultiply_count": 0,
+          "inputs": [
+            { "image": { "node_name": "request", "data_item": "image" } },
+            {
+              "detection": {
+                "node_name": "face_detection_node",
+                "output": "face_rois_out"
+              }
+            }
+          ],
+          "params": {
+            "confidence_threshold": "0.7",
+            "convert_to_gray_scale": "false",
+            "target_image_width": "48",
+            "target_image_height": "48",
+            "max_output_batch": "100",
+            "buffer_queue_size": "24"
+          },
+          "outputs": [
+            { "data_item": "images", "alias": "face_images" },
+            { "data_item": "coordinates", "alias": "face_coordinates" },
+            { "data_item": "confidences", "alias": "confidence_levels" }
+          ]
+        },
+        {
+          "name": "face-landmarks-regression",
+          "model_name": "landmarks-regression",
+          "type": "DL model",
+          "inputs": [
+            {
+              "data": {
+                "node_name": "extract_node",
+                "data_item": "face_images"
+              }
+            }
+          ],
+          "outputs": [{ "data_item": "95", "alias": "face_landmarks_out" }]
+        },
+        {
+          "name": "image_transformation_node",
+          "library_name": "image_transformation_custom",
+          "type": "custom",
+          "params": {
+            "make_transform": "true",
+            "target_image_width": "128",
+            "target_image_height": "128",
+            "original_image_color_order": "BGR",
+            "target_image_color_order": "BGR",
+            "original_image_layout": "CHW",
+            "target_image_layout": "CHW",
+            "debug": "true"
+          },
+          "inputs": [
+            {
+              "image": {
+                "node_name": "extract_node",
+                "data_item": "face_images"
+              }
+            },
+            {
+              "landmarks": {
+                "node_name": "face-landmarks-regression",
+                "data_item": "face_landmarks_out"
+              }
+            }
+          ],
+          "outputs": [
+            { "data_item": "image", "alias": "transformed_image_out" }
+          ]
+        },
+        {
+          "name": "face_embedding_node",
+          "model_name": "face_recognition_model",
+          "type": "DL model",
+          "inputs": [
+            {
+              "data": {
+                "node_name": "image_transformation_node",
+                "data_item": "transformed_image_out"
+              }
+            }
+          ],
+          "outputs": [{ "data_item": "658/add_", "alias": "embeddings_out" }]
+        }
+      ],
+      "outputs": [
+        {
+          "embeddings": {
+            "node_name": "face_embedding_node",
+            "data_item": "embeddings_out"
+          }
+        },
+        {
+          "face_landmarks": {
+            "node_name": "face_landmark_node",
+            "data_item": "face_landmarks_out"
+          }
+        },
+
+        {
+          "transformed_image": {
+            "node_name": "image_transformation_node",
+            "data_item": "transformed_image_out"
+          }
+        },
+
+        {
+          "face_image": {
+            "node_name": "extract_node",
+            "data_item": "face_image_out"
+          }
+        },
+        {
+          "face_coordinates": {
+            "node_name": "extract_node",
+            "data_item": "face_coordinates_out"
+          }
+        },
+
+        {
+          "confidence_levels": {
+            "node_name": "extract_node",
+            "data_item": "confidence_levels_out"
+          }
+        }
+      ]
+    }
+  ]
 }

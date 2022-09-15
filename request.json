@@ -1,0 +1,10 @@
+{
+	"room_name": "my-first-room",
+	"audio_track_id": "TR_AMLbJuiXkaQ5GP",
+	"video_track_id": "TR_VCyyeUH9VH5Nmc",
+	"stream": {
+		"urls": [
+			"rtmp://stream/mystream"
+		]
+	}
+}

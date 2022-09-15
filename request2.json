@@ -1,0 +1,9 @@
+{
+  "room_name": "my-first-room",
+	"audio_track_id": "TR_AMvogkS97J96C8",
+	"video_track_id": "TR_VCEhgSLrWvSHUm",
+  "file": {
+    "file_type": "MP4",
+    "filepath": "/out/data/room-composite-1.mp4"
+  }
+}
