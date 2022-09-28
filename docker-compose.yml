@@ -1,6 +1,5 @@
-version: '3'
+version: "3"
 services:
-
   db:
     env_file: .env.prod
     # TODO: Add Kafka pub/sub to perform operations after receieving data from stream.
@@ -8,9 +7,9 @@ services:
     image: neo4j:latest
     restart: unless-stopped
     ports:
-      - ${N4J_BOLT_PORT:-7687}:7687
+      - ${N4J_BOLT_PORTl-7687}:7687
       - ${N4J_HTTP_PORT:-7474}:7474
-        # - ${N4J_HTTPS_PORT:-7473}:7473 # For Https
+        # - ${N4J_HTTPS_PORT:-8473}:7473 # For Https
     environment:
       - NEO4J_AUTH=${N4J_AUTH:-neo4j/test}
     volumes:
@@ -19,7 +18,6 @@ services:
       - ${N4J_IMPORT_DIR:-./neo4j/import}:/var/lib/neo4j/import
       - ${N4J_PLUGIN_DIR:-./neo4j/plugins}:/plugins
         # - ${N4J_CONF_DIR:-./neo4j/conf}:/conf Only ever use config file or env variables
-        # - ${N4J_SSL_DIR:-./neo4j/ssl}:/ssl 
 
   cache:
     env_file: .env.prod
@@ -28,30 +26,28 @@ services:
     restart: unless-stopped
     ports:
       - ${REDIS_HTTP_PORT:-6379}:6379
-    command:
-      redis-server /usr/local/etc/redis 
+    command: redis-server /usr/local/etc/redis
     volumes:
       - ${REDIS_CONF:-./redis}:/usr/local/etc/redis
       - ${REDIS_ACL:-./redis/users.acl}:/etc/redis/users.acl
 
   sfu:
     env_file: .env.prod
-    # TODO: Add prometheus to monitor service, port: 6789
+    # TODO: Add prometheus to monitor service, port: 7789
     profiles: ["webrtc", "backend"]
     image: livekit/livekit-server
     restart: unless-stopped
     ports:
-      - ${LK_SERVER_PORT:-7880}:7880 
-      - ${LK_TCP_PORT:-7881}:7881 
+      - ${LK_SERVER_PORT:-7880}:7880
+      - ${LK_TCP_PORT:-7881}:7881
       - ${LK_UDP_PORT:-7882}:7882/udp
-    command: 
-      --config /livekit.yaml
+    command: --config /livekit.yaml
     volumes:
       - ${LKCONFIG_PATH:-./livekit.yaml}:/livekit.yaml
     depends_on: # This will deprecate in near future.
       - stun
       - cache
-  
+
   stun:
     env_file: .env.prod
     # TODO: Use prometheus for monitoring status, port: 9641
@@ -65,29 +61,27 @@ services:
       - ${TURNSERVER_CONFIG:-./stun/turnserver.conf}:/etc/coturn/turnserver.conf
 
   recorder:
-    profile: ["webrtc", "backend"]
+    profiles: ["webrtc", "backend"]
     image: livekit/egress
-    environment: 
+    environment:
       - EGRESS_CONFIG_FILE=/out/config.yaml
     volumes:
       - ${EGRESS_CONFIG_PATH:-./egress.yaml}:/out/config.yaml
 
- ai:
+  ai:
     env_file: .env.prod
-    profiles: ["ai","backend"]
+    profiles: ["ai", "backend"]
     image: openvino/model_server
-    ports: 
+    ports:
       - ${OPENVINO_RPC_PORT:-9001}:9001
       - ${OPENVINO_REST_PORT:-8001}:8001
     volumes:
       - ${MODELS_PATH:-./openvino/models}:/models/
       - ${MODEL_SERVER_CONFIG:-./openvino/config.json}:/opt/ml/config.json
-    command:
-      --config_path /opt/ml/config.json --port 9001 --rest_port 8001
+    command: --config_path /opt/ml/config.json --port 9001 --rest_port 8001
 
   object_store:
     profiles: ["object_store", "backend"]
-    env_file: .env.prod
     image: minio/minio
     ports:
       - ${MINIO_PORT:-9000}:9000
@@ -96,6 +90,6 @@ services:
       - ${MINIO_CONFIG_PATH:-./minio/.minio/config}:/root/.minio
     environment:
       - MINIO_ROOT_USER=${MINIO_ROOT_USER:-foobar}
-      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD:-8540304a492157284fdc89f7093d2b8e52d925a0b9a1345f7c097abbf94465f8}
-      - MINIO_HTTP_TRACE=${MINIO_HTTP_TRACE:-/dev/stdout}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD:-foobarfoobarfoobar}
+      - MINIO_HTTP_TRACE=/stdout
     command: server /export
