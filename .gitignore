@@ -4,3 +4,5 @@ dev/neo4j/
 # Minio Data Files
 minio/
 dev/minio/
+# Ignore VSCode Launch Files
+.vscode/
