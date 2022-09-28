@@ -165,14 +165,12 @@
             "data_item": "face_landmarks_out"
           }
         },
-
         {
           "transformed_image": {
             "node_name": "image_transformation_node",
             "data_item": "transformed_image_out"
           }
         },
-
         {
           "face_image": {
             "node_name": "extract_node",
@@ -185,7 +183,6 @@
             "data_item": "face_coordinates_out"
           }
         },
-
         {
           "confidence_levels": {
             "node_name": "extract_node",

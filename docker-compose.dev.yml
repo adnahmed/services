@@ -1,6 +1,5 @@
 version: '3'
 services:
-
   db:
     env_file: .env.dev
     # TODO: Add Kafka pub/sub to perform operations after receieving data from stream.
