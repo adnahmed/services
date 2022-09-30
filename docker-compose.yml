@@ -63,6 +63,7 @@ services:
   recorder:
     profiles: ["webrtc", "backend"]
     image: livekit/egress
+    restart: unless-stopped
     environment:
       - EGRESS_CONFIG_FILE=/out/config.yaml
     volumes:
@@ -93,3 +94,10 @@ services:
       - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD:-foobarfoobarfoobar}
       - MINIO_HTTP_TRACE=/stdout
     command: server /export
+
+  # ai_server:
+  #   env_file: .env.prod
+  #   profiles: ["ai", "openvino", "backend"]
+  #   build: ./ai
+  #   ports:
+  #     - ":"
