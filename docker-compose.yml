@@ -95,6 +95,14 @@ services:
       - MINIO_HTTP_TRACE=/stdout
     command: server /export
 
+  rtmp_stream:
+    profiles: ["webrtc", "backend"]
+    image: aler9/rtsp-simple-server
+    ports: 
+      - 8554:8554
+      - 1935:1935
+      - 8888:8888
+
   # ai_server:
   #   env_file: .env.prod
   #   profiles: ["ai", "openvino", "backend"]
